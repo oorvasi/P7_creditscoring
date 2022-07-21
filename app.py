@@ -2,6 +2,8 @@ import pickle
 import pandas as pd
 from flask import Flask
 from flask import jsonify
+import json
+import requests
 
 app = Flask(__name__)
 
@@ -9,52 +11,41 @@ app = Flask(__name__)
 def home():
     return "Prêt à dépenser API"
 
+def load_data():
+    # load datas
+    # data of the customers preprocessed (imputed, normalized)
+    sample = pd.read_csv('sample_preproc.csv.zip', index_col='SK_ID_CURR')
+
+    return sample
+
 def load_model():
     # load model
     pickle_classifier = open('LGBMClassifier.pkl','rb')
     clf=pickle.load(pickle_classifier)
+
     return clf
 
-@app.get('/{customerID}')
-def predict():
-    """
-    This function is used for making prediction.
-    """
+def load_prediction(sample, id, clf):
+    X=sample.iloc[:, :-1]
+    score = clf.predict_proba(X[X.index == int(id)])[:,1]
+    return score
 
-    # Input data from dashboard request
-    request_json = request.get_json()
-    print(request_json)
-    data = []
-    for key in request_json.keys():
-        data.append(request_json[key])
+@app.route('/predict/<customer_id>', methods=['GET','POST'])
+def predict(customer_id):
 
-    # Loading the model
-    model = load_model()
+    customer_id = str(customer_id)
+    clf = load_model()
+    sample = load_data()
 
-    # Making prediction
-    y_proba = model.predict_proba([data])[0][0]
+    prediction = load_prediction(sample, customer_id, clf)
 
-    # Looking for the customer situation (class 0 or 1)
-    # by using the best threshold from precision-recall curve
-    y_class = round(y_proba, 2)
-    best_threshold = 0.36
-    customer_class = np.where(y_class > best_threshold, 1, 0)
-
-    # Customer score calculation
-    score = int(y_class * 100)
-
-    # Customer credit application result
-    if customer_class == 1:
-        result = 'à risque'
-        status = 'refusée'
+    # Compute decision according to the best threshold
+    if prediction >= 0.35:
+        decision = "Prêt Accordé 🎉😎"
     else:
-        result = 'sans risque'
-        status = 'acceptée'
+        decision = "Prêt Rejeté 😥🤯"
 
-    # API response to the dashboard
-    response = json.dumps(
-        {'score': score, 'class': result, 'application': status})
-    return response, 200
+    return decision
 
 
 if __name__ == '__main__':
