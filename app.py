@@ -14,8 +14,6 @@ def load_model():
     clf=pickle.load(pickle_classifier)
     return clf
 
-# load data
-df_data = pd.read_csv('sample_preproc.csv', index_col='SK_ID_CURR')
 
 @app.route('/predict/{customerID}', methods=['GET', 'POST'])
 def predict():
@@ -53,7 +51,7 @@ def predict():
     # API response to the dashboard
     response = json.dumps(
         {'score': score, 'class': result, 'prediction': prediction})
-    return response, 200
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)
