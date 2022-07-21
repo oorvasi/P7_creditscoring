@@ -3,6 +3,7 @@ import pandas as pd
 from flask import Flask
 from flask import jsonify
 import json
+from lightgbm import LGBMClassifier
 
 app = Flask(__name__)
 
