@@ -19,7 +19,7 @@ def load_data():
 
 def load_model():
     # load model
-    pickle_classifier = open('git push -u origin master LGBMClassifier.pkl','rb')
+    pickle_classifier = open('LGBMClassifier.pkl','rb')
     clf=pickle.load(pickle_classifier)
 
     return clf
