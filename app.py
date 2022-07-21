@@ -10,12 +10,12 @@ app.config["DEBUG"] = True
 
 def load_model():
     # load model
-    pickle_classifier = open('../models/LGBMClassifier.pkl','rb')
+    pickle_classifier = open('LGBMClassifier.pkl','rb')
     clf=pickle.load(pickle_classifier)
     return clf
 
 # load data
-df_data = pd.read_csv('../datas/sample_preproc.csv', index_col='SK_ID_CURR')
+df_data = pd.read_csv('sample_preproc.csv', index_col='SK_ID_CURR')
 
 @app.route('/predict/{customerID}', methods=['GET', 'POST'])
 def predict():
