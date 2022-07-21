@@ -15,7 +15,12 @@ def load_model():
     return clf
 
 
-@app.route('/predict/{customerID}', methods=['GET', 'POST'])
+@app.get("/")
+async def root():
+    return {"message": "Prêt à dépenser API"}
+
+@app.get('/{customerID}')
+
 def predict():
     """
     This function is used for making prediction.
