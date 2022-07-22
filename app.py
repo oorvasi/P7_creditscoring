@@ -4,7 +4,6 @@ from flask import Flask
 from flask import jsonify
 import json
 from lightgbm import LGBMClassifier
-
 app = Flask(__name__)
 
 @app.route("/")
@@ -45,7 +44,10 @@ def predict(customer_id):
     else:
         decision = "Prêt Rejeté 😥🤯"
 
-    return decision
+    response = json.dumps(
+        {'decision': decision, 'prediction': round(float(prediction)*100, 2)}, ensure_ascii=False)
+
+    return response
 
 
 if __name__ == '__main__':
